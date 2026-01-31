@@ -8,23 +8,11 @@ import {
   View,
 } from "react-native";
 import BottomNavBar from "../../components/BottomNavBar";
-
-// export default function HomeScreen({ navigation }: any) {
-//   const [onDuty, setOnDuty] = useState(true);
-//   const [jobStatus, setJobStatus] = useState<
-//     "AVAILABLE" | "ASSIGNED" | "WORKING"
-//   >("AVAILABLE");
-
-//   const getStepIndex = () => {
-//     if (jobStatus === "AVAILABLE") return 0;
-//     if (jobStatus === "ASSIGNED") return 1;
-//     return 2;
-//   };
-
+import { useSignup } from "../../context/SignupContext";
 
 
 export default function HomeScreen({ navigation, route }: any) {
-  const [onDuty, setOnDuty] = useState(true);
+  const [onDuty, setOnDuty] = useState(false);
   const [jobStatus, setJobStatus] = useState<
     "AVAILABLE" | "ASSIGNED" | "WORKING"
   >("AVAILABLE");
@@ -42,6 +30,7 @@ export default function HomeScreen({ navigation, route }: any) {
     return 2;
   };
 
+const { signupData } = useSignup();
 
 
   return (
@@ -61,8 +50,11 @@ export default function HomeScreen({ navigation, route }: any) {
                 <Text style={{ fontSize: 18 }}>👤</Text>
               </View>
               <View>
-                <Text style={styles.name}>Rajesh Kumar</Text>
-                <Text style={styles.rating}>⭐ 4.8 (124)</Text>
+                <Text style={styles.name}>
+  {signupData.name || "Worker"}
+</Text>
+<Text style={styles.rating}>⭐ 0.0 (0)</Text>
+
               </View>
             </View>
 
@@ -84,12 +76,15 @@ export default function HomeScreen({ navigation, route }: any) {
         <View style={styles.statsRow}>
           <View style={styles.statCardGreen}>
             <Text style={styles.statTitle}>Today's Jobs</Text>
-            <Text style={styles.statValue}>3</Text>
+            <Text style={styles.statValue}>0</Text>
+
           </View>
 
           <View style={styles.statCardBlue}>
             <Text style={styles.statTitle}>Today's Earnings</Text>
-            <Text style={styles.statValue}>₹1,200</Text>
+            
+            <Text style={styles.statValue}>₹0</Text>
+
           </View>
         </View>
 
@@ -192,7 +187,7 @@ const styles = StyleSheet.create({
 
   /* ---------- TOP ---------- */
   topContainer: {
-    backgroundColor: "#1E5EFF",
+    backgroundColor: "#4F46E5",
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     paddingTop: 44,
@@ -325,7 +320,7 @@ const styles = StyleSheet.create({
   },
   otpButton: {
     flex: 1,
-    backgroundColor: "#2563EB",
+    backgroundColor: "#4F46E5",
     padding: 16,
     borderRadius: 14,
     alignItems: "center",

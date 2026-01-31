@@ -9,11 +9,12 @@ import PhoneConfirm from "../screens/auth/CreateAccount/PhoneConfirm";
 import WorkType from "../screens/auth/CreateAccount/WorkType";
 
 import LanguageSelect from "../screens/auth/LanguageSelect";
-import LocationPermission from "../screens/auth/LocationPermission";
+
 import LoginScreen from "../screens/auth/LoginScreen";
-import OtpVerification from "../screens/auth/OtpVerification";
+import PasswordVerification from "../screens/auth/PasswordVerification";
 import SplashScreen from "../screens/splash/SplashScreen";
 
+import CreatePassword from "../screens/auth/CreateAccount/CreatePassword";
 import JobHistory from "../screens/history/ JobHistory";
 import WorkerHome from "../screens/home/WorkerHome";
 import EndJobOtp from "../screens/job/EndJobOtp";
@@ -34,8 +35,8 @@ const AuthNavigator = () => {
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="LanguageSelect" component={LanguageSelect} />
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="OtpVerification" component={OtpVerification} />
-      <Stack.Screen name="LocationPermission" component={LocationPermission} />
+      <Stack.Screen name="PasswordVerification" component={PasswordVerification} />
+      
       <Stack.Screen name="NameScreen" component={NameScreen} />
       <Stack.Screen name="WorkType" component={WorkType} />
       <Stack.Screen name="PhoneConfirm" component={PhoneConfirm} />
@@ -49,6 +50,7 @@ const AuthNavigator = () => {
       <Stack.Screen name="JobHistory" component={JobHistory} />
       <Stack.Screen name="Notifications" component={Notifications} />
       <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="CreatePassword" component={CreatePassword} />
 
 
      

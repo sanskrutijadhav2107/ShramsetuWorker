@@ -1,22 +1,25 @@
 import React, { useState } from "react";
 import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
-const jobs = [
-  "Plumber",
-  "Electrician",
-  "Painter",
-  "Carpenter",
-  "Delivery",
-  "Cleaning",
-];
+import { WORK_TYPES } from "../../../constants/workerOptions";
+import { useSignup } from "../../../context/SignupContext";
 
 const WorkType = ({ navigation }: any) => {
-  const [selected, setSelected] = useState("Plumber");
+  const { updateSignupData } = useSignup();
+  const [selected, setSelected] = useState(WORK_TYPES[0]);
+
+  const onContinue = () => {
+    updateSignupData({
+      role: "worker",
+      service_type: selected.value,
+    });
+
+    navigation.navigate("Experience");
+  };
 
   return (
     <View style={styles.container}>
@@ -25,30 +28,27 @@ const WorkType = ({ navigation }: any) => {
         Select your primary skill
       </Text>
 
-      {jobs.map(job => (
+      {WORK_TYPES.map(job => (
         <TouchableOpacity
-          key={job}
+          key={job.value}
           style={[
             styles.option,
-            selected === job && styles.selected,
+            selected.value === job.value && styles.selected,
           ]}
           onPress={() => setSelected(job)}
         >
           <Text
             style={[
               styles.optionText,
-              selected === job && styles.selectedText,
+              selected.value === job.value && styles.selectedText,
             ]}
           >
-            {job}
+            {job.label}
           </Text>
         </TouchableOpacity>
       ))}
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Experience")}
-      >
+      <TouchableOpacity style={styles.button} onPress={onContinue}>
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -56,6 +56,9 @@ const WorkType = ({ navigation }: any) => {
 };
 
 export default WorkType;
+
+/* styles SAME as your existing ones */
+
 
 const styles = StyleSheet.create({
   container: {

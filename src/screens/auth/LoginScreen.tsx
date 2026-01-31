@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -11,11 +12,20 @@ import {
 const LoginScreen = ({ navigation }: any) => {
   const [mobile, setMobile] = useState("");
 
+  const handleContinue = () => {
+    if (mobile.length !== 10) {
+      Alert.alert("Invalid number", "Enter valid 10 digit mobile number");
+      return;
+    }
+
+    navigation.navigate("PasswordVerification", {
+      mobile,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-
-        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Login</Text>
           <Text style={styles.subtitle}>
@@ -23,7 +33,6 @@ const LoginScreen = ({ navigation }: any) => {
           </Text>
         </View>
 
-        {/* Mobile Input */}
         <View style={styles.inputBox}>
           <Text style={styles.code}>+91</Text>
           <TextInput
@@ -36,42 +45,31 @@ const LoginScreen = ({ navigation }: any) => {
           />
         </View>
 
-        {/* Voice Info */}
-        <View style={styles.voiceBox}>
-          <Text style={styles.voiceTitle}>🎤 Voice Input Available</Text>
-          <Text style={styles.voiceSub}>
-            Tap the mic icon to speak your number
-          </Text>
-        </View>
-
-        {/* Create Account Link */}
         <TouchableOpacity
           style={styles.createAccount}
           onPress={() => navigation.navigate("NameScreen")}
         >
           <Text style={styles.createText}>
-            Not have an account?{" "}
+            Don’t have an account?{" "}
             <Text style={styles.createLink}>Create new</Text>
           </Text>
         </TouchableOpacity>
 
-        {/* Get OTP Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() =>
-            navigation.navigate("OtpVerification", { mobile })
-          }
-          activeOpacity={0.9}
+          onPress={handleContinue}
         >
-          <Text style={styles.buttonText}>Get OTP</Text>
+          <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
-
       </View>
     </SafeAreaView>
   );
 };
 
 export default LoginScreen;
+
+/* styles SAME as yours */
+
 
 const styles = StyleSheet.create({
   safe: {
@@ -167,3 +165,13 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+
+
+
+
+
+
+
+
+

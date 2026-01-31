@@ -1,59 +1,3 @@
-// import React from "react";
-// import { ScrollView, StyleSheet, Text, View } from "react-native";
-
-// export default function Notifications() {
-//   return (
-//     <ScrollView style={styles.container}>
-//       <View style={styles.card}>
-//         <Text style={styles.title}>New Job Request</Text>
-//         <Text style={styles.desc}>
-//           Kitchen sink repair in HSR Layout. ₹500 payment.
-//         </Text>
-//         <Text style={styles.time}>2 minutes ago</Text>
-//       </View>
-
-//       <View style={styles.card}>
-//         <Text style={styles.title}>Payment Received</Text>
-//         <Text style={styles.desc}>₹600 credited for bathroom repair.</Text>
-//         <Text style={styles.time}>1 hour ago</Text>
-//       </View>
-
-//       <View style={styles.card}>
-//         <Text style={styles.title}>New Review</Text>
-//         <Text style={styles.desc}>
-//           Priya Sharma rated you 5 stars ⭐
-//         </Text>
-//         <Text style={styles.time}>2 hours ago</Text>
-//       </View>
-//     </ScrollView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: "#F5F7FB", padding: 16 },
-//   card: {
-//     backgroundColor: "#FFF",
-//     padding: 16,
-//     borderRadius: 16,
-//     marginBottom: 12,
-//     marginTop:30,
-//   },
-//   title: { fontWeight: "700" },
-//   desc: { color: "#6B7280", marginVertical: 6 },
-//   time: { fontSize: 12, color: "#9CA3AF" },
-// });
-
-
-
-
-
-
-
-
-
-
-
-
 import React from "react";
 import {
   ScrollView,
@@ -70,7 +14,8 @@ export default function Notifications() {
       {/* ================= HEADER ================= */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.backBtn}>
+          <TouchableOpacity style={styles.backBtn}
+          >
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
 
