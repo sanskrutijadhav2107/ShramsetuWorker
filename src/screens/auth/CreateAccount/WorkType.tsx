@@ -57,7 +57,7 @@ const WorkType = ({ navigation }: any) => {
 
 export default WorkType;
 
-/* styles SAME as your existing ones */
+
 
 
 const styles = StyleSheet.create({

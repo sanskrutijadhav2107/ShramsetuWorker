@@ -1,10 +1,8 @@
 export const WORK_TYPES = [
-  { label: "Plumber", value: "plumber" },
+  { label: "Carpenter", value: "carpenter" },
   { label: "Electrician", value: "electrician" },
   { label: "Painter", value: "painter" },
-  { label: "Carpenter", value: "carpenter" },
-  { label: "Delivery", value: "delivery" },
-  { label: "Cleaning", value: "cleaning" },
+  { label: "Cleaner", value: "cleaner" },
 ];
 
 export const EXPERIENCE_MAP: Record<string, number> = {
