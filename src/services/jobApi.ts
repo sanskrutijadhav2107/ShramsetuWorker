@@ -30,22 +30,12 @@ export const getWorkerJobs = async (workerId: number) => {
   };
 };
 
-/**
- * Accept job
- * POST /jobs/accept/{jobId}?worker_id={workerId}
- */
-export const acceptJob = async (jobId: number, workerId: number) => {
-  return api.post(`/jobs/accept/${jobId}`, null, {
+export const acceptJob = (jobId: number, workerId: number) =>
+  api.post(`/jobs/accept/${jobId}`, null, {
     params: { worker_id: workerId },
   });
-};
 
-/**
- * Reject job
- * POST /jobs/reject/{jobId}?worker_id={workerId}
- */
-export const rejectJob = async (jobId: number, workerId: number) => {
-  return api.post(`/jobs/reject/${jobId}`, null, {
+export const rejectJob = (jobId: number, workerId: number) =>
+  api.post(`/jobs/reject/${jobId}`, null, {
     params: { worker_id: workerId },
   });
-};
