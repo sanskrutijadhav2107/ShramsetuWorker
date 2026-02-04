@@ -12,7 +12,40 @@ export const createJob = async (payload: {
 };
 
 // ---------------- WORKER: GET ASSIGNED JOBS ----------------
-export const getWorkerJobs = async (workerUserId: number) => {
-  const res = await api.get(`/job/jobs/worker/pending?user_id=${workerUserId}`);
-  return res.data;
+// export const getWorkerJobs = async (workerUserId: number) => {
+//   const res = await api.get(`/job/jobs/worker/pending?user_id=${workerUserId}`);
+//   return res.data;
+// };
+export const getWorkerJobs = async (workerId: number) => {
+  const res = await api.get(`/jobs/pending-by-worker/${workerId}`);
+
+  if (res.data?.has_job) {
+    return {
+      jobs: [res.data.job],
+    };
+  }
+
+  return {
+    jobs: [],
+  };
+};
+
+/**
+ * Accept job
+ * POST /jobs/accept/{jobId}?worker_id={workerId}
+ */
+export const acceptJob = async (jobId: number, workerId: number) => {
+  return api.post(`/jobs/accept/${jobId}`, null, {
+    params: { worker_id: workerId },
+  });
+};
+
+/**
+ * Reject job
+ * POST /jobs/reject/{jobId}?worker_id={workerId}
+ */
+export const rejectJob = async (jobId: number, workerId: number) => {
+  return api.post(`/jobs/reject/${jobId}`, null, {
+    params: { worker_id: workerId },
+  });
 };

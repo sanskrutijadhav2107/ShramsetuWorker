@@ -439,7 +439,28 @@ export default function HomeScreen({ navigation, route }: any) {
     }
   };
 
-  // 🔁 poll jobs
+  // const startPolling = () => {
+  //   stopPolling();
+
+  //   pollingRef.current = setInterval(async () => {
+  //     try {
+  //       const res = await getWorkerJobs(signupData.user_id!);
+  //       // getWorkerJobs MUST call /job/jobs/worker/pending
+
+  //       if (res?.jobs?.length > 0) {
+  //         const job = res.jobs[0];
+
+  //         // ❌ DO NOT mark assigned here
+  //         // ❌ DO NOT stop polling permanently yet
+
+  //         navigation.navigate("IncomingJob", { job });
+  //       }
+  //     } catch (err) {
+  //       console.log("Polling error:", err);
+  //     }
+  //   }, 5000);
+  // };
+
   const startPolling = () => {
     stopPolling();
 
@@ -447,14 +468,15 @@ export default function HomeScreen({ navigation, route }: any) {
       try {
         const res = await getWorkerJobs(signupData.user_id!);
 
-        if (res?.jobs?.length > 0) {
-          const job = res.jobs[0];
-          stopPolling();
-          setJobStatus("ASSIGNED");
-          navigation.navigate("IncomingJob", { job });
+        console.log("📡 POLLING RESPONSE:", res);
+
+        if (res.jobs.length > 0) {
+          console.log("✅ JOB FOUND FOR WORKER:", res.jobs[0]);
+        } else {
+          console.log("⏳ NO JOB FOR THIS WORKER");
         }
       } catch (err) {
-        console.log("Polling error:", err);
+        console.log("❌ POLLING ERROR:", err);
       }
     }, 5000);
   };
