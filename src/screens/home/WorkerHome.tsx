@@ -918,6 +918,51 @@ const styles = StyleSheet.create({
     backgroundColor: "#E5E7EB",
   },
 
+
+
+  /* ---------- OTP ---------- */
+  otpRow: {
+    flexDirection: "row",
+    gap: 12,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  otpButton: {
+    flex: 1,
+    backgroundColor: "#4F46E5",
+    padding: 16,
+    borderRadius: 14,
+    alignItems: "center",
+  },
+  otpText: { color: "#FFF", fontWeight: "700" },
+
+  /* ---------- JOB ---------- */
+  recentTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+
+  jobCard: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    elevation: 3,
+  },
+  jobTitle: { fontWeight: "700" },
+  jobLocation: { color: "#6B7280", marginTop: 2 },
+  jobTime: { color: "#9CA3AF", fontSize: 12 },
+  jobRight: { alignItems: "flex-end" },
+  completed: { color: "#22C55E", fontSize: 12, fontWeight: "600" },
+  amount: { fontWeight: "700", fontSize: 16 },
+
+  /* ---------- OFF DUTY ---------- */
+
   offDutyOverlay: {
     position: "absolute",
     top: 190,
