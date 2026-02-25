@@ -17,13 +17,14 @@ import SplashScreen from "../screens/splash/SplashScreen";
 import CreatePassword from "../screens/auth/CreateAccount/CreatePassword";
 import JobHistory from "../screens/history/ JobHistory";
 import WorkerHome from "../screens/home/WorkerHome";
+import BookedJobScreen from "../screens/job/BookedJobScreen";
 import EndJobOtp from "../screens/job/EndJobOtp";
 import IncomingJob from "../screens/job/IncomingJob";
 import MapNavigation from "../screens/job/MapNavigation";
 import StartJobOtp from "../screens/job/StartJobOtp";
+import WorkerActiveJobScreen from "../screens/job/WorkerActiveJobScreen";
 import Notifications from "../screens/notifications/Notifications";
 import Profile from "../screens/profile/Profile";
-
 
 
 
@@ -51,8 +52,8 @@ const AuthNavigator = () => {
       <Stack.Screen name="Notifications" component={Notifications} />
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="CreatePassword" component={CreatePassword} />
-
-
+      <Stack.Screen name="BookedJob" component={BookedJobScreen} />
+      <Stack.Screen name="WorkerActiveJob" component={WorkerActiveJobScreen} />
      
     </Stack.Navigator>
   );

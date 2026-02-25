@@ -1,5 +1,8 @@
-// // import React, { useEffect, useRef, useState } from "react";
+
+
+// // import React, { useCallback, useEffect, useRef, useState } from "react";
 // // import {
+// //   Alert,
 // //   Animated,
 // //   StyleSheet,
 // //   Text,
@@ -7,28 +10,49 @@
 // //   View,
 // // } from "react-native";
 
-// // const IncomingJob = ({ navigation }: any) => {
-// //   const [timeLeft, setTimeLeft] = useState(30);
+// // import { useSignup } from "../../context/SignupContext";
+// // import { acceptJob, rejectJob } from "../../services/jobApi";
+
+// // const IncomingJob = ({ navigation, route }: any) => {
+// //   const { signupData } = useSignup();
+// //   const { job } = route.params;
+
+// //   // 🔒 SAFETY: worker must exist
+// //   if (!signupData.user_id) {
+// //     throw new Error("Worker not logged in");
+// //   }
+
 // //   const scaleAnim = useRef(new Animated.Value(1)).current;
 
+// //   /* ================= TIMER ================= */
+
+// //   const calculateTimeLeft = useCallback(() => {
+// //     const diff = new Date(job.expires_at).getTime() - Date.now();
+// //     return Math.max(0, Math.floor(diff / 1000));
+// //   }, [job.expires_at]);
+
+// //   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
 // //   useEffect(() => {
-// //     // Countdown
 // //     const timer = setInterval(() => {
-// //       setTimeLeft((prev) => {
-// //         if (prev <= 1) {
-// //           clearInterval(timer);
-// //           navigation.goBack();
-// //           return 0;
-// //         }
-// //         return prev - 1;
-// //       });
+// //       const remaining = calculateTimeLeft();
+
+// //       if (remaining <= 0) {
+// //         clearInterval(timer);
+// //         Alert.alert("Job expired", "You did not respond in time");
+// //         navigation.goBack();
+// //         return;
+// //       }
+
+// //       setTimeLeft(remaining);
 // //     }, 1000);
 
 // //     return () => clearInterval(timer);
-// //   }, []);
+// //   }, [calculateTimeLeft, navigation]);
+
+// //   /* ================= PULSE ANIMATION ================= */
 
 // //   useEffect(() => {
-// //     // Alarm pulse animation
 // //     Animated.loop(
 // //       Animated.sequence([
 // //         Animated.timing(scaleAnim, {
@@ -41,46 +65,58 @@
 // //           duration: 500,
 // //           useNativeDriver: true,
 // //         }),
-// //       ])
+// //       ]),
 // //     ).start();
-// //   }, []);
+// //   }, [scaleAnim]);
+
+// //   /* ================= ACTIONS ================= */
+
+// //   const handleAccept = async () => {
+// //     try {
+// //       await acceptJob(job.id, signupData.user_id!);
+// //       navigation.navigate("MapNavigation", { jobId: job.id });
+// //     } catch (err: any) {
+// //       if (err.response?.status === 410) {
+// //         Alert.alert("Expired", "Job already expired");
+// //       } else {
+// //         Alert.alert("Error", "Unable to accept job");
+// //       }
+// //       navigation.goBack();
+// //     }
+// //   };
+
+// //   const handleReject = async () => {
+// //     try {
+// //       await rejectJob(job.id, signupData.user_id!);
+// //     } catch (err) {
+// //       console.log("Reject failed:", err);
+// //     }
+// //     navigation.goBack();
+// //   };
+
+// //   /* ================= UI ================= */
 
 // //   return (
 // //     <View style={styles.container}>
-// //       {/* Job Card (UP) */}
+// //       {/* JOB CARD */}
 // //       <View style={styles.card}>
 // //         <Text style={styles.title}>New Job Request</Text>
 
 // //         <View style={styles.row}>
 // //           <Text style={styles.label}>Job Type</Text>
-// //           <Text style={styles.value}>Kitchen Sink Repair</Text>
+// //           <Text style={styles.value}>{job.service_type}</Text>
 // //         </View>
 
 // //         <View style={styles.row}>
-// //           <Text style={styles.label}>Location</Text>
-// //           <Text style={styles.value}>HSR Layout, Bangalore</Text>
-// //           <Text style={styles.subText}>2.3 km away</Text>
-// //         </View>
-
-// //         <View style={styles.row}>
-// //           <Text style={styles.label}>Payment</Text>
-// //           <Text style={styles.pay}>₹500</Text>
-// //         </View>
-
-// //         <View style={styles.row}>
-// //           <Text style={styles.label}>Customer</Text>
-// //           <Text style={styles.value}>Priya Sharma</Text>
-// //           <Text style={styles.subText}>⭐ 4.9 (45 reviews)</Text>
+// //           <Text style={styles.label}>Description</Text>
+// //           <Text style={styles.value}>{job.description}</Text>
 // //         </View>
 // //       </View>
 
-// //       {/* BIG CIRCULAR TIMER (DOWN) */}
+// //       {/* TIMER */}
 // //       <View style={styles.timerContainer}>
 // //         <Animated.View
-// //           style={[
-// //             styles.timerCircle,
-// //             { transform: [{ scale: scaleAnim }] },
-// //           ]}
+// //           style={[styles.timerCircle, { transform: [{ scale: scaleAnim }] }]}
 // //         >
 // //           <Text style={styles.timerText}>
 // //             {timeLeft < 10 ? `0${timeLeft}` : timeLeft}
@@ -89,19 +125,13 @@
 // //         </Animated.View>
 // //       </View>
 
-// //       {/* Actions */}
+// //       {/* ACTION BUTTONS */}
 // //       <View style={styles.actions}>
-// //         <TouchableOpacity
-// //         style={styles.reject}
-// //         onPress={() => navigation.navigate("WorkerHome")}>
-
+// //         <TouchableOpacity style={styles.reject} onPress={handleReject}>
 // //           <Text style={styles.rejectText}>Reject</Text>
 // //         </TouchableOpacity>
 
-// //         <TouchableOpacity
-// //           style={styles.accept}
-// //           onPress={() => navigation.navigate("MapNavigation")}
-// //         >
+// //         <TouchableOpacity style={styles.accept} onPress={handleAccept}>
 // //           <Text style={styles.acceptText}>Accept</Text>
 // //         </TouchableOpacity>
 // //       </View>
@@ -110,6 +140,8 @@
 // // };
 
 // // export default IncomingJob;
+
+// // /* ================= STYLES ================= */
 
 // // const styles = StyleSheet.create({
 // //   container: {
@@ -147,17 +179,6 @@
 // //     color: "#111827",
 // //   },
 
-// //   subText: {
-// //     fontSize: 12,
-// //     color: "#9CA3AF",
-// //   },
-
-// //   pay: {
-// //     fontSize: 18,
-// //     fontWeight: "700",
-// //   },
-
-// //   /* TIMER */
 // //   timerContainer: {
 // //     alignItems: "center",
 // //     marginVertical: 30,
@@ -197,7 +218,6 @@
 // //     borderRadius: 14,
 // //     alignItems: "center",
 // //     marginRight: 8,
-// //     marginBottom: 40,
 // //   },
 
 // //   rejectText: {
@@ -212,7 +232,6 @@
 // //     borderRadius: 14,
 // //     alignItems: "center",
 // //     marginLeft: 8,
-// //     marginBottom: 40,
 // //   },
 
 // //   acceptText: {
@@ -221,135 +240,150 @@
 // //   },
 // // });
 
-// import React, { useEffect, useRef, useState } from "react";
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useState } from "react";
 // import {
+//   ActivityIndicator,
 //   Alert,
-//   Animated,
 //   StyleSheet,
 //   Text,
+//   TextInput,
 //   TouchableOpacity,
-//   View,
+//   View
 // } from "react-native";
-
 // import { useSignup } from "../../context/SignupContext";
-// import { acceptJob, rejectJob } from "../../services/jobApi";
+// import {  sendQuotation } from "../../services/quotationApi";
+// import { getWorkerJobs } from "../../services/jobApi";
 
-// const IncomingJob = ({ navigation, route }: any) => {
+// const IncomingJob = () => {
+
 //   const { signupData } = useSignup();
-//   const { job } = route.params; // 👈 JOB COMES FROM HOMESCREEN
 
-//   const scaleAnim = useRef(new Animated.Value(1)).current;
+//   const [job, setJob] = useState<any>(null);
+//   const [quotation, setQuotation] = useState("");
+//   const [loading, setLoading] = useState(true);
 
-//   // 🔑 time left from backend expiry
-//   const calculateTimeLeft = () => {
-//     const diff = new Date(job.expires_at).getTime() - Date.now();
-//     return Math.max(0, Math.floor(diff / 1000));
-//   };
-
-//   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-
-//   /* ================= TIMER ================= */
+//   /* 🔁 Poll every 3 sec for new job */
 //   useEffect(() => {
-//     const timer = setInterval(() => {
-//       const remaining = calculateTimeLeft();
 
-//       if (remaining <= 0) {
-//         clearInterval(timer);
-//         Alert.alert("Job expired", "You did not respond in time");
-//         navigation.goBack();
-//         return;
+//     const interval = setInterval(async () => {
+//       try {
+
+//         if (!signupData?.user_id) return;
+
+//         const res = await getWorkerJobs(signupData.user_id);
+
+//         if (!res.has_job) {
+//           setJob(null);
+//           setLoading(false);
+//           return;
+//         }
+
+//         setJob(res.job);
+//         setLoading(false);
+
+//       } catch (e) {
+//         console.log("Polling pending job error");
 //       }
 
-//       setTimeLeft(remaining);
-//     }, 1000);
+//     }, 3000);
 
-//     return () => clearInterval(timer);
+//     return () => clearInterval(interval);
+
 //   }, []);
 
-//   /* ================= PULSE ANIMATION ================= */
-//   useEffect(() => {
-//     Animated.loop(
-//       Animated.sequence([
-//         Animated.timing(scaleAnim, {
-//           toValue: 1.1,
-//           duration: 500,
-//           useNativeDriver: true,
-//         }),
-//         Animated.timing(scaleAnim, {
-//           toValue: 1,
-//           duration: 500,
-//           useNativeDriver: true,
-//         }),
-//       ]),
-//     ).start();
-//   }, []);
+//   /* 📤 SEND QUOTATION */
+//   const handleSendQuotation = async () => {
 
-//   /* ================= ACTIONS ================= */
+//     if (!quotation) {
+//       Alert.alert("Enter quotation message");
+//       return;
+//     }
 
-//   const handleAccept = async () => {
+//     if (!signupData?.user_id || !job?.id) {
+//       Alert.alert("Missing job or user");
+//       return;
+//     }
+
 //     try {
-//       await acceptJob(job.id, signupData.user_id);
-//       navigation.navigate("MapNavigation", { jobId: job.id });
-//     } catch (err: any) {
-//       if (err.response?.status === 410) {
-//         Alert.alert("Expired", "Job already expired");
-//       } else {
-//         Alert.alert("Error", "Unable to accept job");
-//       }
-//       navigation.goBack();
+
+//       await sendQuotation(
+//         job.id,
+//         signupData.user_id,
+//         quotation
+//       );
+
+//       Alert.alert("Quotation Sent!");
+
+//       setJob(null);
+//       setQuotation("");
+
+//     } catch (e) {
+//       Alert.alert("Failed to send quotation");
 //     }
 //   };
 
-//   const handleReject = async () => {
-//     try {
-//       await rejectJob(job.id, signupData.user_id);
-//     } catch (err) {
-//       // backend already handles cleanup
-//     }
-//     navigation.goBack();
-//   };
+//   /* ⏳ Loading */
+//   if (loading) {
+//     return (
+//       <View style={styles.center}>
+//         <ActivityIndicator size="large" color="#1E5EFF" />
+//         <Text style={{ marginTop: 20 }}>Searching for nearby jobs...</Text>
+//       </View>
+//     );
+//   }
 
-//   /* ================= UI ================= */
+//   /* 🚫 No Job */
+//   if (!job) {
+//     return (
+//       <View style={styles.center}>
+//         <Text style={styles.noJob}>No incoming requests</Text>
+//         <Text style={styles.sub}>Stay online to receive jobs</Text>
+//       </View>
+//     );
+//   }
 
+//   /* 🧾 JOB UI */
 //   return (
 //     <View style={styles.container}>
-//       {/* JOB CARD */}
-//       <View style={styles.card}>
-//         <Text style={styles.title}>New Job Request</Text>
 
-//         <View style={styles.row}>
-//           <Text style={styles.label}>Job Type</Text>
-//           <Text style={styles.value}>{job.service_type}</Text>
-//         </View>
+//       <Text style={styles.title}>New Customer Request 🔔</Text>
 
-//         <View style={styles.row}>
-//           <Text style={styles.label}>Description</Text>
-//           <Text style={styles.value}>{job.description}</Text>
-//         </View>
-//       </View>
+//       <Text style={styles.label}>Service</Text>
+//       <Text style={styles.value}>{job.service_type}</Text>
 
-//       {/* TIMER */}
-//       <View style={styles.timerContainer}>
-//         <Animated.View
-//           style={[styles.timerCircle, { transform: [{ scale: scaleAnim }] }]}
-//         >
-//           <Text style={styles.timerText}>
-//             {timeLeft < 10 ? `0${timeLeft}` : timeLeft}
-//           </Text>
-//           <Text style={styles.timerSub}>seconds left</Text>
-//         </Animated.View>
-//       </View>
+//       <Text style={styles.label}>Problem Description</Text>
+//       <Text style={styles.value}>{job.description}</Text>
 
-//       {/* ACTIONS */}
-//       <View style={styles.actions}>
-//         <TouchableOpacity style={styles.reject} onPress={handleReject}>
-//           <Text style={styles.rejectText}>Reject</Text>
-//         </TouchableOpacity>
+//       <Text style={styles.label}>Your Message / Price</Text>
 
-//         <TouchableOpacity style={styles.accept} onPress={handleAccept}>
-//           <Text style={styles.acceptText}>Accept</Text>
-//         </TouchableOpacity>
-//       </View>
+//       <TextInput
+//         placeholder="Example: I will come in 20 mins. Charges ₹250"
+//         style={styles.input}
+//         multiline
+//         value={quotation}
+//         onChangeText={setQuotation}
+//       />
+
+//       <TouchableOpacity
+//         style={styles.sendBtn}
+//         onPress={handleSendQuotation}
+//       >
+//         <Text style={styles.sendText}>Send Quotation</Text>
+//       </TouchableOpacity>
+
 //     </View>
 //   );
 // };
@@ -357,199 +391,114 @@
 // export default IncomingJob;
 
 // const styles = StyleSheet.create({
+
 //   container: {
 //     flex: 1,
-//     backgroundColor: "#F5F7FB",
-//     padding: 16,
+//     padding: 20,
+//     backgroundColor: "#fff"
 //   },
 
-//   card: {
-//     backgroundColor: "#FFFFFF",
-//     borderRadius: 20,
-//     padding: 20,
-//     marginTop: 150,
-//     elevation: 4,
+//   center: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center"
 //   },
 
 //   title: {
-//     fontSize: 18,
+//     fontSize: 22,
 //     fontWeight: "700",
-//     marginBottom: 16,
-//   },
-
-//   row: {
-//     marginBottom: 12,
+//     marginBottom: 30,
+//     color: "#1E5EFF"
 //   },
 
 //   label: {
-//     fontSize: 12,
-//     color: "#6B7280",
+//     marginTop: 14,
+//     color: "#6B7280"
 //   },
 
 //   value: {
-//     fontSize: 15,
+//     fontSize: 16,
 //     fontWeight: "600",
-//     color: "#111827",
+//     marginTop: 4
 //   },
 
-//   subText: {
-//     fontSize: 12,
-//     color: "#9CA3AF",
+//   input: {
+//     marginTop: 10,
+//     borderWidth: 1,
+//     borderColor: "#E5E7EB",
+//     borderRadius: 12,
+//     padding: 14,
+//     minHeight: 90,
+//     textAlignVertical: "top"
 //   },
 
-//   pay: {
-//     fontSize: 18,
-//     fontWeight: "700",
-//   },
-
-//   /* TIMER */
-//   timerContainer: {
-//     alignItems: "center",
-//     marginVertical: 30,
-//   },
-
-//   timerCircle: {
-//     width: 140,
-//     height: 140,
-//     borderRadius: 70,
-//     backgroundColor: "#4472efff",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     elevation: 6,
-//   },
-
-//   timerText: {
-//     color: "#FFFFFF",
-//     fontSize: 36,
-//     fontWeight: "800",
-//   },
-
-//   timerSub: {
-//     color: "#FEE2E2",
-//     fontSize: 12,
-//   },
-
-//   actions: {
-//     flexDirection: "row",
-//     marginTop: "auto",
-//     marginBottom: 40,
-//   },
-
-//   reject: {
-//     flex: 1,
-//     backgroundColor: "#FEE2E2",
-//     paddingVertical: 16,
+//   sendBtn: {
+//     marginTop: 30,
+//     backgroundColor: "#1E5EFF",
+//     padding: 16,
 //     borderRadius: 14,
-//     alignItems: "center",
-//     marginRight: 8,
-//     marginBottom: 40,
+//     alignItems: "center"
 //   },
 
-//   rejectText: {
-//     color: "#DC2626",
+//   sendText: {
+//     color: "#fff",
 //     fontWeight: "700",
+//     fontSize: 16
 //   },
 
-//   accept: {
-//     flex: 1,
-//     backgroundColor: "#22C55E",
-//     paddingVertical: 16,
-//     borderRadius: 14,
-//     alignItems: "center",
-//     marginLeft: 8,
-//     marginBottom: 40,
+//   noJob: {
+//     fontSize: 20,
+//     fontWeight: "700"
 //   },
 
-//   acceptText: {
-//     color: "#FFFFFF",
-//     fontWeight: "700",
-//   },
+//   sub: {
+//     marginTop: 8,
+//     color: "#6B7280"
+//   }
+
 // });
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from "react";
 import {
   Alert,
-  Animated,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
 import { useSignup } from "../../context/SignupContext";
-import { acceptJob, rejectJob } from "../../services/jobApi";
+import { rejectJob } from "../../services/jobApi";
+import { sendQuotation } from "../../services/quotationApi";
 
 const IncomingJob = ({ navigation, route }: any) => {
   const { signupData } = useSignup();
   const { job } = route.params;
 
-  // 🔒 SAFETY: worker must exist
   if (!signupData.user_id) {
     throw new Error("Worker not logged in");
   }
 
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-
-  /* ================= TIMER ================= */
-
-  const calculateTimeLeft = useCallback(() => {
-    const diff = new Date(job.expires_at).getTime() - Date.now();
-    return Math.max(0, Math.floor(diff / 1000));
-  }, [job.expires_at]);
-
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const remaining = calculateTimeLeft();
-
-      if (remaining <= 0) {
-        clearInterval(timer);
-        Alert.alert("Job expired", "You did not respond in time");
-        navigation.goBack();
-        return;
-      }
-
-      setTimeLeft(remaining);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [calculateTimeLeft, navigation]);
-
-  /* ================= PULSE ANIMATION ================= */
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-  }, [scaleAnim]);
+  const [quote, setQuote] = useState("");
 
   /* ================= ACTIONS ================= */
-
-  const handleAccept = async () => {
-    try {
-      await acceptJob(job.id, signupData.user_id!);
-      navigation.navigate("MapNavigation", { jobId: job.id });
-    } catch (err: any) {
-      if (err.response?.status === 410) {
-        Alert.alert("Expired", "Job already expired");
-      } else {
-        Alert.alert("Error", "Unable to accept job");
-      }
-      navigation.goBack();
-    }
-  };
 
   const handleReject = async () => {
     try {
@@ -560,11 +509,26 @@ const IncomingJob = ({ navigation, route }: any) => {
     navigation.goBack();
   };
 
+  const handleSendQuote = async () => {
+    if (!quote.trim()) {
+      Alert.alert("Enter quotation message");
+      return;
+    }
+
+    try {
+      await sendQuotation(job.id, signupData.user_id!, quote);
+
+      Alert.alert("Quotation sent to customer");
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", "Failed to send quotation");
+    }
+  };
+
   /* ================= UI ================= */
 
   return (
     <View style={styles.container}>
-      {/* JOB CARD */}
       <View style={styles.card}>
         <Text style={styles.title}>New Job Request</Text>
 
@@ -577,18 +541,19 @@ const IncomingJob = ({ navigation, route }: any) => {
           <Text style={styles.label}>Description</Text>
           <Text style={styles.value}>{job.description}</Text>
         </View>
-      </View>
 
-      {/* TIMER */}
-      <View style={styles.timerContainer}>
-        <Animated.View
-          style={[styles.timerCircle, { transform: [{ scale: scaleAnim }] }]}
-        >
-          <Text style={styles.timerText}>
-            {timeLeft < 10 ? `0${timeLeft}` : timeLeft}
-          </Text>
-          <Text style={styles.timerSub}>seconds left</Text>
-        </Animated.View>
+        {/* QUOTATION INPUT */}
+        <Text style={styles.quoteTitle}>
+          Send quotation to customer
+        </Text>
+
+        <TextInput
+          value={quote}
+          onChangeText={setQuote}
+          placeholder="Example: I can repair it for ₹250"
+          multiline
+          style={styles.input}
+        />
       </View>
 
       {/* ACTION BUTTONS */}
@@ -597,8 +562,8 @@ const IncomingJob = ({ navigation, route }: any) => {
           <Text style={styles.rejectText}>Reject</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.accept} onPress={handleAccept}>
-          <Text style={styles.acceptText}>Accept</Text>
+        <TouchableOpacity style={styles.accept} onPress={handleSendQuote}>
+          <Text style={styles.acceptText}>Send Quote</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -620,7 +585,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 20,
-    marginTop: 150,
+    marginTop: 120,
     elevation: 4,
   },
 
@@ -645,30 +610,19 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
 
-  timerContainer: {
-    alignItems: "center",
-    marginVertical: 30,
+  quoteTitle: {
+    marginTop: 20,
+    fontWeight: "700",
+    fontSize: 14,
   },
 
-  timerCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "#4472efff",
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 6,
-  },
-
-  timerText: {
-    color: "#FFFFFF",
-    fontSize: 36,
-    fontWeight: "800",
-  },
-
-  timerSub: {
-    color: "#FEE2E2",
-    fontSize: 12,
+  input: {
+    backgroundColor: "#F3F4F6",
+    padding: 14,
+    borderRadius: 12,
+    marginTop: 10,
+    minHeight: 80,
+    textAlignVertical: "top",
   },
 
   actions: {

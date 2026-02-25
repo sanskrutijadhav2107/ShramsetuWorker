@@ -128,16 +128,22 @@ const tabs = [
     route: "JobHistory",
   },
   {
-    label: "Notifications",
+    label: "otp verification",
     icon: "notifications-outline",
     activeIcon: "notifications",
-    route: "Notifications",
+    route: "WorkerActiveJob",
   },
   {
     label: "Profile",
     icon: "person-outline",
     activeIcon: "person",
     route: "Profile",
+  },
+  {
+    label: "Active Job",
+    icon: "person-outline",
+    activeIcon: "person",
+    route: "BookedJob",
   },
 ];
 
@@ -156,7 +162,7 @@ export default function BottomNavBar() {
               key={tab.route}
               style={styles.tab}
               activeOpacity={0.75}
-              onPress={() => navigation.navigate(tab.route)}
+             onPress={() => navigation.navigate("Auth", { screen: tab.route })}
             >
               <View style={[styles.iconWrap, active && styles.activeBg]}>
                 <Ionicons
