@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -9,11 +9,19 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSignup } from "../../../context/SignupContext";
+// import { speak } from "expo-speech";
+import { speak } from "../../../utils/voiceAssistant";
 
 const EnterPassword = ({ navigation }: any) => {
   const { signupData, updateSignupData } = useSignup();
   const [password, setPassword] = useState("");
-
+useEffect(() => {
+  speak(
+    "Please enter your password to continue",
+    "जारी रखने के लिए अपना पासवर्ड दर्ज करें",
+    "पुढे जाण्यासाठी तुमचा पासवर्ड टाका"
+  );
+}, []);
   const mobile = signupData.phone_number; // ✅ from context
 
   const handleContinue = () => {

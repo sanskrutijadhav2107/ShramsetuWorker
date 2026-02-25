@@ -1,36 +1,147 @@
-import React, { useState } from "react";
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+// import React, { useState } from "react";
+// import {
+//   Alert,
+//   StyleSheet,
+//   Text,
+//   TextInput,
+//   TouchableOpacity,
+//   View,
+// } from "react-native";
+// import { useSignup } from "../../../context/SignupContext";
+
+// const NameScreen = ({ navigation }: any) => {
+//   const [name, setName] = useState("");
+//   const { updateSignupData } = useSignup();
+
+//   const handleContinue = () => {
+//     if (name.trim().length < 2) {
+//       Alert.alert("Invalid name", "Please enter your full name");
+//       return;
+//     }
+
+//     // ✅ SAVE TO CONTEXT
+//     updateSignupData({ name: name.trim() });
+
+//     navigation.navigate("PhoneConfirm");
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.title}>What’s your name?</Text>
+//       <Text style={styles.subtitle}>
+//         This will be shown to employers
+//       </Text>
+
+//       <TextInput
+//         style={styles.input}
+//         placeholder="Enter your full name"
+//         value={name}
+//         onChangeText={setName}
+//       />
+
+//       <View style={styles.voiceBox}>
+//         <Text style={styles.voiceText}>🎤 Tap to speak your name</Text>
+//       </View>
+
+//       <TouchableOpacity
+//         style={styles.button}
+//         onPress={handleContinue}
+//       >
+//         <Text style={styles.buttonText}>Continue</Text>
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
+
+// export default NameScreen;
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, padding: 24, backgroundColor: "#FFF" },
+//   title: { fontSize: 22, fontWeight: "700", marginTop: 80 },
+//   subtitle: { fontSize: 14, color: "#6B7280", marginBottom: 24 },
+//   input: {
+//     backgroundColor: "#F3F4F6",
+//     borderRadius: 12,
+//     padding: 16,
+//     fontSize: 16,
+//   },
+//   voiceBox: {
+//     marginTop: 12,
+//     backgroundColor: "#EEF4FF",
+//     padding: 14,
+//     borderRadius: 12,
+//   },
+//   voiceText: {
+//     fontSize: 14,
+//     color: "#1E5EFF",
+//     fontWeight: "600",
+//   },
+//   button: {
+//     marginTop: "auto",
+//     marginBottom: 80,
+//     backgroundColor: "#1E5EFF",
+//     paddingVertical: 16,
+//     borderRadius: 14,
+//     alignItems: "center",
+//   },
+//   buttonText: { color: "#FFF", fontSize: 16, fontWeight: "600" },
+// });
+
+
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSignup } from "../../../context/SignupContext";
+import { startLoginRecording, stopLoginRecording } from "../../../utils/loginVoice";
+import { speak } from "../../../utils/voiceAssistant";
 
 const NameScreen = ({ navigation }: any) => {
   const [name, setName] = useState("");
+  const [listening, setListening] = useState(false);
   const { updateSignupData } = useSignup();
+
+  useEffect(() => {
+    speak(
+      "Please tell me your full name after pressing the microphone",
+      "माइक दबाकर अपना पूरा नाम बोलिए",
+      "माईक दाबून तुमचे पूर्ण नाव सांगा"
+    );
+  }, []);
 
   const handleContinue = () => {
     if (name.trim().length < 2) {
-      Alert.alert("Invalid name", "Please enter your full name");
+      Alert.alert("Invalid name");
       return;
     }
 
-    // ✅ SAVE TO CONTEXT
     updateSignupData({ name: name.trim() });
-
     navigation.navigate("PhoneConfirm");
+  };
+
+  const handleVoice = async () => {
+    if (!listening) {
+      setListening(true);
+      // speak("Listening");
+      await startLoginRecording();
+    } else {
+      setListening(false);
+      // speak("Processing");
+
+      const text = await stopLoginRecording();
+      if (!text) return;
+
+      setName(text);
+
+      speak(
+        `Your name is ${text}. If correct press continue`,
+        `आपका नाम ${text} है। सही है तो जारी रखें`,
+        `तुमचे नाव ${text} आहे. बरोबर असेल तर पुढे जा`
+      );
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>What’s your name?</Text>
-      <Text style={styles.subtitle}>
-        This will be shown to employers
-      </Text>
 
       <TextInput
         style={styles.input}
@@ -39,14 +150,13 @@ const NameScreen = ({ navigation }: any) => {
         onChangeText={setName}
       />
 
-      <View style={styles.voiceBox}>
-        <Text style={styles.voiceText}>🎤 Tap to speak your name</Text>
-      </View>
+      <TouchableOpacity style={styles.voiceBox} onPress={handleVoice}>
+        <Text style={styles.voiceText}>
+          {listening ? "Listening..." : "🎤 Tap to speak your name"}
+        </Text>
+      </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleContinue}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleContinue}>
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -58,31 +168,9 @@ export default NameScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24, backgroundColor: "#FFF" },
   title: { fontSize: 22, fontWeight: "700", marginTop: 80 },
-  subtitle: { fontSize: 14, color: "#6B7280", marginBottom: 24 },
-  input: {
-    backgroundColor: "#F3F4F6",
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-  },
-  voiceBox: {
-    marginTop: 12,
-    backgroundColor: "#EEF4FF",
-    padding: 14,
-    borderRadius: 12,
-  },
-  voiceText: {
-    fontSize: 14,
-    color: "#1E5EFF",
-    fontWeight: "600",
-  },
-  button: {
-    marginTop: "auto",
-    marginBottom: 80,
-    backgroundColor: "#1E5EFF",
-    paddingVertical: 16,
-    borderRadius: 14,
-    alignItems: "center",
-  },
+  input: { backgroundColor: "#F3F4F6", borderRadius: 12, padding: 16, fontSize: 16 },
+  voiceBox: { marginTop: 12, backgroundColor: "#EEF4FF", padding: 14, borderRadius: 12 },
+  voiceText: { fontSize: 14, color: "#1E5EFF", fontWeight: "600" },
+  button: { marginTop: "auto", marginBottom: 80, backgroundColor: "#1E5EFF", paddingVertical: 16, borderRadius: 14, alignItems: "center" },
   buttonText: { color: "#FFF", fontSize: 16, fontWeight: "600" },
 });

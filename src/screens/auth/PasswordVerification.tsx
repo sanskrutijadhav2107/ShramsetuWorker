@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { speak } from "@/src/utils/voiceAssistant";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   SafeAreaView,
@@ -11,13 +12,20 @@ import {
 import { useSignup } from "../../context/SignupContext";
 import { loginWithPassword } from "../../services/auth";
 
+// import { speak } from "../../utils/voiceAssistant";
 
 const EnterPassword = ({ route, navigation }: any) => {
   const { mobile } = route.params;
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { updateSignupData } = useSignup();
-
+useEffect(() => {
+  speak(
+    "Please enter your password to continue",
+    "जारी रखने के लिए अपना पासवर्ड दर्ज करें",
+    "पुढे जाण्यासाठी तुमचा पासवर्ड टाका"
+  );
+}, []);
 
   const handleLogin = async () => {
     if (password.length < 6) {
