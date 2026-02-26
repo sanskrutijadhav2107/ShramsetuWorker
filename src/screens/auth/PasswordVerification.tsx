@@ -19,6 +19,7 @@ const EnterPassword = ({ route, navigation }: any) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { updateSignupData } = useSignup();
+  
 useEffect(() => {
   speak(
     "Please enter your password to continue",

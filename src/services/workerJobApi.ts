@@ -62,3 +62,24 @@ export const getWorkerHistory = async (workerId: number) => {
   const res = await api.get(`/jobs/worker-history/${workerId}`);
   return res.data;
 };
+
+
+
+export const updateWorkerLocation = async (
+  workerId: number,
+  latitude: number,
+  longitude: number
+) => {
+  const res = await api.post("/worker/update-location", {
+    worker_id: workerId,
+    latitude,
+    longitude,
+  });
+
+  return res.data;
+};
+
+export const getWorkerLocation = async (workerId: number) => {
+  const res = await api.get(`/worker/location/${workerId}`);
+  return res.data;
+};
