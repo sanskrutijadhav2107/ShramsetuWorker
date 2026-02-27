@@ -1,22 +1,3 @@
-// import api from "./api";
-
-// export const getBookedJob = async (workerId: number) => {
-//   const res = await api.get(`/jobs/worker-booked/${workerId}`);
-//   return res.data;
-// };
-
-// export const acceptBookedJob = async (jobId: number, workerId: number) => {
-//   const res = await api.post(`/jobs/accept/${jobId}?worker_id=${workerId}`);
-//   return res.data;
-// };
-
-
-
-
-
-
-
-
 
 
 import api from "./api";
@@ -34,7 +15,6 @@ export const acceptBookedJob = async (jobId: number, workerId: number) => {
   );
   return res.data;
 };
-
 
 
 

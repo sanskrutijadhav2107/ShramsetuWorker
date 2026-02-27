@@ -37,7 +37,6 @@ const AuthNavigator = () => {
       <Stack.Screen name="LanguageSelect" component={LanguageSelect} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="PasswordVerification" component={PasswordVerification} />
-      
       <Stack.Screen name="NameScreen" component={NameScreen} />
       <Stack.Screen name="WorkType" component={WorkType} />
       <Stack.Screen name="PhoneConfirm" component={PhoneConfirm} />
@@ -46,7 +45,6 @@ const AuthNavigator = () => {
       <Stack.Screen name="IncomingJob" component={IncomingJob} />
       <Stack.Screen name="MapNavigation" component={MapNavigation} />
       <Stack.Screen name="StartJobOtp" component={StartJobOtp} />
-
       <Stack.Screen name="EndJobOtp" component={EndJobOtp} />
       <Stack.Screen name="JobHistory" component={JobHistory} />
       <Stack.Screen name="Notifications" component={Notifications} />

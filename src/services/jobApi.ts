@@ -11,11 +11,7 @@ export const createJob = async (payload: {
   return res.data;
 };
 
-// ---------------- WORKER: GET ASSIGNED JOBS ----------------
-// export const getWorkerJobs = async (workerUserId: number) => {
-//   const res = await api.get(`/job/jobs/worker/pending?user_id=${workerUserId}`);
-//   return res.data;
-// };
+
 export const getWorkerJobs = async (workerId: number) => {
   const res = await api.get(`/jobs/pending-by-worker/${workerId}`);
 
