@@ -1,12 +1,12 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import BottomNavBar from "../../components/BottomNavBar";
