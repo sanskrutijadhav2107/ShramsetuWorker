@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "shramsetuW",
-    "slug": "shramsetuW",
+    "name": "shramsetuWorker",
+    "slug": "shramsetuWorker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/ShramsetuLogo.png",
     "scheme": "shramsetuw",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

@@ -56,7 +56,7 @@ useEffect(() => {
         <View style={styles.header}>
           <Text style={styles.title}>Create Password</Text>
           <Text style={styles.subtitle}>
-            Set a password for +91 {mobile ?? "your number"}
+            {/* Set a password for +91 {mobile ?? "your number"} */}
           </Text>
         </View>
 

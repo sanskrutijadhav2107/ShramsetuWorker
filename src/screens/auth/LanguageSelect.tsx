@@ -83,8 +83,9 @@ const LanguageSelect = ({ navigation }: any) => {
 
         {/* Header */}
         <View style={styles.header}>
+          <Text style={styles.maintitle}>Shramsetu Worker</Text>
           <Text style={styles.title}>Choose Your Language</Text>
-          <Text style={styles.subtitle}>अपनी भाषा चुनें</Text>
+          
         </View>
 
         {/* Language List */}
@@ -142,8 +143,13 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   title: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  maintitle: {
     fontSize: 22,
     fontWeight: "700",
+    paddingBottom:10,
   },
   subtitle: {
     fontSize: 14,

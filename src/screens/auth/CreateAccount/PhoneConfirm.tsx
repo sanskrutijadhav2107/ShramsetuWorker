@@ -88,7 +88,7 @@ const PhoneConfirm = ({ navigation }: any) => {
       <View style={styles.phoneBox}>
         <Text style={styles.countryCode}>+91</Text>
         <TextInput
-          placeholder="Your number will appear here"
+          placeholder=""
           keyboardType="number-pad"
           maxLength={10}
           value={phone}

@@ -71,7 +71,7 @@ export default function Profile() {
 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#4F46E5" },
+  container: { flex: 1, backgroundColor: "#1E5EFF" },
 
   header: {
     alignItems: "center",
