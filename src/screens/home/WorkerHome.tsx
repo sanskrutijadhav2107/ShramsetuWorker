@@ -1,13 +1,21 @@
 
+
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
+  Modal,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import * as DocumentPicker from "expo-document-picker";
+import api from "../../services/api";
 
 import BottomNavBar from "../../components/BottomNavBar";
 import { useSignup } from "../../context/SignupContext";
@@ -16,6 +24,19 @@ import { setAvailability } from "../../services/worker";
 
 export default function HomeScreen({ navigation, route }: any) {
   const { signupData } = useSignup();
+
+  /* ================= AADHAAR STATE ================= */
+
+  const [isVerified, setIsVerified] = useState(
+    signupData?.is_verified ?? false
+  );
+
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [shareCode, setShareCode] = useState("");
+  const [selectedFile, setSelectedFile] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  /* ================= WORK STATE ================= */
 
   const [onDuty, setOnDuty] = useState(false);
   const [jobStatus, setJobStatus] = useState<
@@ -32,21 +53,87 @@ export default function HomeScreen({ navigation, route }: any) {
     }
   }, [route?.params?.jobStatus]);
 
-  const getStepIndex = () => {
-    if (jobStatus === "AVAILABLE") return 0;
-    if (jobStatus === "ASSIGNED") return 1;
-    return 2;
+  /* ================= PICK ZIP ================= */
+
+  const pickAadhaar = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "application/zip",
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled) return;
+
+      setSelectedFile(result.assets[0]);
+      setShowCodeModal(true);
+    } catch {
+      Alert.alert("Could not open file picker");
+    }
+  };
+
+  /* ================= VERIFY ================= */
+
+  const submitAadhaar = async () => {
+    if (!selectedFile) {
+      Alert.alert("Select Aadhaar ZIP file first");
+      return;
+    }
+
+    if (shareCode.length !== 8) {
+      Alert.alert("Enter valid 8 character share code");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      formData.append("file", {
+        uri: selectedFile.uri,
+        name: selectedFile.name || "aadhaar.zip",
+        type: "application/zip",
+      } as any);
+
+      formData.append("share_code", shareCode);
+
+      const res = await api.post(
+        `/aadhaar/verify/${signupData.user_id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.data?.verified) {
+        setIsVerified(true);
+        setShowCodeModal(false);
+        setShareCode("");
+        Alert.alert("Verified ✅", "Your identity is successfully verified");
+      } else {
+        Alert.alert("Verification failed");
+      }
+    } catch (err: any) {
+      console.log("VERIFY ERROR:", err?.response?.data || err);
+      Alert.alert("Upload failed", "Check ZIP password and try again");
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* ================= TOGGLE DUTY ================= */
 
   const toggleDuty = async (value: boolean) => {
-    setOnDuty(value);
-
-    if (!signupData.user_id) {
-      console.log("❌ No user_id found");
+    if (!isVerified) {
+      Alert.alert("Verification Required", "Please verify Aadhaar first");
       return;
     }
+
+    setOnDuty(value);
+
+    if (!signupData.user_id) return;
 
     try {
       await setAvailability({
@@ -54,43 +141,27 @@ export default function HomeScreen({ navigation, route }: any) {
         is_available: value,
       });
 
-      if (value) {
-        startPolling();
-      } else {
-        stopPolling();
-        setJobStatus("AVAILABLE");
-      }
-    } catch (err) {
-      console.log("❌ Availability error:", err);
-    }
+      if (value) startPolling();
+      else stopPolling();
+    } catch {}
   };
 
   /* ================= POLLING ================= */
 
   const startPolling = () => {
-    stopPolling(); // safety
+    stopPolling();
 
     pollingRef.current = setInterval(async () => {
       try {
         const res = await getWorkerJobs(signupData.user_id!);
 
-        console.log("📡 POLLING RESPONSE:", res);
-
         if (res.jobs.length > 0) {
           const job = res.jobs[0];
-
-          console.log("✅ JOB FOUND:", job);
-
-          stopPolling(); // 🔒 VERY IMPORTANT
+          stopPolling();
           setJobStatus("ASSIGNED");
-
           navigation.navigate("IncomingJob", { job });
-        } else {
-          console.log("⏳ No job for this worker");
         }
-      } catch (err) {
-        console.log("❌ Polling error:", err);
-      }
+      } catch {}
     }, 5000);
   };
 
@@ -101,41 +172,47 @@ export default function HomeScreen({ navigation, route }: any) {
     }
   };
 
-  /* ================= CLEANUP ================= */
-
   useEffect(() => {
     return () => stopPolling();
   }, []);
+
+  const getStepIndex = () => {
+    if (jobStatus === "AVAILABLE") return 0;
+    if (jobStatus === "ASSIGNED") return 1;
+    return 2;
+  };
 
   /* ================= UI ================= */
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView
-        style={styles.container}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 90 }}
-      >
-        {/* HEADER */}
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
         <View style={styles.topContainer}>
           <View style={styles.profileRow}>
             <View style={styles.profileLeft}>
               <View style={styles.avatar}>
                 <Text style={{ fontSize: 18 }}>👤</Text>
               </View>
+
               <View>
-                <Text style={styles.name}>{signupData.name || "Worker"}</Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={styles.name}>
+                    {signupData.name || "Worker"}
+                  </Text>
+
+                  {isVerified && (
+                    <View style={styles.verifiedBadge}>
+                      <Text style={styles.verifiedText}>✔ Verified</Text>
+                    </View>
+                  )}
+                </View>
+
                 <Text style={styles.rating}>⭐ 0.0 (0)</Text>
               </View>
             </View>
 
             <View style={styles.toggleWrap}>
-              <Switch
-                value={onDuty}
-                onValueChange={toggleDuty}
-                trackColor={{ false: "#CBD5E1", true: "#86EFAC" }}
-                thumbColor={onDuty ? "#22C55E" : "#9CA3AF"}
-              />
+              <Switch value={onDuty} onValueChange={toggleDuty} />
               <Text style={styles.toggleText}>
                 {onDuty ? "ON Duty" : "OFF Duty"}
               </Text>
@@ -143,7 +220,19 @@ export default function HomeScreen({ navigation, route }: any) {
           </View>
         </View>
 
-        {/* STATS */}
+        {!isVerified && (
+          <TouchableOpacity style={styles.verifyCard} onPress={pickAadhaar}>
+            <Text style={styles.verifyTitle}>🪪 Verify Your Identity</Text>
+            <Text style={styles.verifySub}>
+              Upload Aadhaar ZIP to receive job requests
+            </Text>
+          </TouchableOpacity>
+        )}
+
+
+
+
+         
         <View style={styles.statsRow}>
           <View style={styles.statCardGreen}>
             <Text style={styles.statTitle}>Today&apos;s Jobs</Text>
@@ -189,18 +278,57 @@ export default function HomeScreen({ navigation, route }: any) {
               </View>
             ))}
           </View>
-        </View>
+        </View> 
       </ScrollView>
 
-      {/* OFF DUTY OVERLAY */}
-      {!onDuty && (
-        <View style={styles.offDutyOverlay} pointerEvents="none">
-          <Text style={styles.offDutyText}>You are OFF Duty</Text>
-          <Text style={styles.offDutySub}>
-            Turn ON duty to accept jobs and use voice assistant
-          </Text>
+      {/* ================= MODAL ================= */}
+
+      <Modal visible={showCodeModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>
+              Enter Aadhaar Share Code
+            </Text>
+
+            <TextInput
+              keyboardType="default"
+              autoCapitalize="characters"
+              maxLength={8}
+              value={shareCode}
+              onChangeText={(text) =>
+                setShareCode(text.toUpperCase())
+              }
+              placeholder="Example: RUGV2007"
+              style={styles.codeInput}
+            />
+
+            {loading ? (
+              <ActivityIndicator size="large" color="#1E5EFF" />
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={styles.submitBtn}
+                  onPress={submitAadhaar}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "700" }}>
+                    Verify
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={() => {
+                    setShowCodeModal(false);
+                    setShareCode("");
+                  }}
+                >
+                  <Text style={{ color: "#555" }}>Cancel</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         </View>
-      )}
+      </Modal>
 
       <BottomNavBar />
     </View>
@@ -214,12 +342,9 @@ const styles = StyleSheet.create({
 
   topContainer: {
     backgroundColor: "#1E5EFF",
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
     paddingTop: 44,
     paddingHorizontal: 16,
     paddingBottom: 36,
-    elevation: 6,
   },
 
   profileRow: {
@@ -243,19 +368,70 @@ const styles = StyleSheet.create({
   name: { color: "#FFFFFF", fontSize: 21, fontWeight: "800" },
   rating: { color: "#E0E7FF", fontSize: 12 },
 
-  toggleWrap: {
+  toggleWrap: { alignItems: "center" },
+  toggleText: { color: "#E0E7FF", fontSize: 12, marginTop: 6 },
+
+  verifyCard: {
+    backgroundColor: "#10B981",
+    margin: 16,
+    padding: 18,
+    borderRadius: 18,
+  },
+
+  verifyTitle: { color: "#fff", fontWeight: "800", fontSize: 16 },
+  verifySub: { color: "#ECFDF5", marginTop: 6, fontSize: 12 },
+
+  verifiedBadge: {
+    marginLeft: 8,
+    backgroundColor: "#22C55E",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+
+  verifiedText: { color: "#fff", fontSize: 11, fontWeight: "700" },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    padding: 8,
+  },
+
+  modalBox: {
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 20,
     borderRadius: 14,
   },
 
-  toggleText: {
-    color: "#E0E7FF",
-    fontSize: 12,
-    marginTop: 6,
-    fontWeight: "700",
+  modalTitle: { fontWeight: "700", marginBottom: 12, fontSize: 16 },
+
+  codeInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 14,
+    textAlign: "center",
+    fontSize: 18,
+    letterSpacing: 2,
   },
+
+  submitBtn: {
+    backgroundColor: "#1E5EFF",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  cancelBtn: {
+    alignItems: "center",
+    padding: 10,
+  },
+
+
 
   statsRow: { flexDirection: "row", gap: 12, padding: 16 },
 
@@ -396,4 +572,8 @@ const styles = StyleSheet.create({
     color: "#475569",
     textAlign: "center",
   },
+
+
+
+
 });

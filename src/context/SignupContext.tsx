@@ -4,10 +4,12 @@ import React, { createContext, useContext, useState } from "react";
  * This shape MUST match backend schema keys
  */
 export type SignupData = {
+  is_verified: boolean;
   phone_number?: string;
   name?: string;
   password?: string;
   confirm_password?: string;
+  aadhaar_verified?: boolean;
 
   role?: "worker";        // "worker"
   language?: string;    // "en", "hi", etc
